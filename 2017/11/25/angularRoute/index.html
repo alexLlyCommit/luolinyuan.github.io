@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>LlyBlog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+  
+  
+  
+  <meta name="description" content="Angular路由复用策略一、引言路由在执行过程中对组件无状态操作，即路由离退时组件状态也一并被删除；当然在绝大多数场景下这是合理的。 但有时一些特殊需求会让人半死亡状态，当然这一切都是为了用户体验；一种非常常见场景，在移动端中用户通过关键词搜索商品，而死不死的这样的列表通常都会是自动下一页动作，此时用户好不容易滚动到第二页并找到想要看的商品时，路由至商品详情页，然后一个后退……用户懵逼了。 An">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LlyBlog">
+<meta property="og:url" content="http://yoursite.com/2017/11/25/angularRoute/index.html">
+<meta property="og:site_name" content="LlyBlog">
+<meta property="og:description" content="Angular路由复用策略一、引言路由在执行过程中对组件无状态操作，即路由离退时组件状态也一并被删除；当然在绝大多数场景下这是合理的。 但有时一些特殊需求会让人半死亡状态，当然这一切都是为了用户体验；一种非常常见场景，在移动端中用户通过关键词搜索商品，而死不死的这样的列表通常都会是自动下一页动作，此时用户好不容易滚动到第二页并找到想要看的商品时，路由至商品详情页，然后一个后退……用户懵逼了。 An">
+<meta property="og:updated_time" content="2017-11-25T02:13:28.084Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LlyBlog">
+<meta name="twitter:description" content="Angular路由复用策略一、引言路由在执行过程中对组件无状态操作，即路由离退时组件状态也一并被删除；当然在绝大多数场景下这是合理的。 但有时一些特殊需求会让人半死亡状态，当然这一切都是为了用户体验；一种非常常见场景，在移动端中用户通过关键词搜索商品，而死不死的这样的列表通常都会是自动下一页动作，此时用户好不容易滚动到第二页并找到想要看的商品时，路由至商品详情页，然后一个后退……用户懵逼了。 An">
+  
+    <link rel="alternate" href="/atom.xml" title="LlyBlog" type="application/atom+xml">
+  
+  <link rel="icon" href="/css/images/favicon.ico">
+  
+    <link href="//fonts.googleapis.com/css?family=Source+Code+Pro" rel="stylesheet" type="text/css">
+  
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Montserrat:700" rel="stylesheet" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto:400,300,300italic,400italic" rel="stylesheet" type="text/css">
+  <link href="//cdn.bootcss.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet">
+  <style type="text/css">
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/9749f0/00000000000000000001008f/27/l?subset_id=2&fvd=n5) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/90cf9f/000000000000000000010091/27/l?subset_id=2&fvd=n7) format("woff2");font-weight:500;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/8a5494/000000000000000000013365/27/l?subset_id=2&fvd=n4) format("woff2");font-weight:lighter;font-style:normal;}
+    @font-face{font-family:futura-pt;src:url(https://use.typekit.net/af/d337d8/000000000000000000010095/27/l?subset_id=2&fvd=i4) format("woff2");font-weight:400;font-style:italic;}</style>
+    
+  <link rel="stylesheet" id="athemes-headings-fonts-css" href="//fonts.googleapis.com/css?family=Yanone+Kaffeesatz%3A200%2C300%2C400%2C700&amp;ver=4.6.1" type="text/css" media="all">
+  <link rel="stylesheet" href="/css/style.css">
+
+  <script src="/js/jquery-3.1.1.min.js"></script>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="/css/bootstrap.css" >
+  <link rel="stylesheet" href="/css/hiero.css" >
+  <link rel="stylesheet" href="/css/glyphs.css" >
+  
+    <link rel="stylesheet" href="/css/vdonate.css" >
+  
+
+</head>
+
+<script>
+var themeMenus = {};
+
+  themeMenus["/"] = "Home"; 
+
+  themeMenus["/archives"] = "Archives"; 
+
+  themeMenus["/categories"] = "Kategorien"; 
+
+  themeMenus["/tags"] = "Tags"; 
+
+  themeMenus["/about"] = "About"; 
+
+</script>
+
+
+  <body data-spy="scroll" data-target="#toc" data-offset="50">
+
+
+  <header id="allheader" class="site-header" role="banner">
+  <div class="clearfix container">
+      <div class="site-branding">
+
+          <h1 class="site-title">
+            
+              <a href="/" title="LlyBlog" rel="home"> LlyBlog </a>
+            
+          </h1>
+
+          
+            
+          <nav id="main-navigation" class="main-navigation" role="navigation">
+            <a class="nav-open">Menu</a>
+            <a class="nav-close">Close</a>
+            <div class="clearfix sf-menu">
+
+              <ul id="main-nav" class="nmenu sf-js-enabled">
+                    
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/">Home</a> </li>
+                    
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/archives">Archives</a> </li>
+                    
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/categories">Kategorien</a> </li>
+                    
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/tags">Tags</a> </li>
+                    
+                      <li class="menu-item menu-item-type-custom menu-item-object-custom menu-item-home menu-item-1663"> <a class="" href="/about">About</a> </li>
+                    
+              </ul>
+            </div>
+          </nav>
+
+
+      </div>
+  </div>
+</header>
+
+
+
+
+  <div id="container">
+    <div id="wrap">
+            
+      <div id="content" class="outer">
+        
+          <section id="main" style="float:none;"><article id="post-angularRoute" style="width: 66%; float:left;" class="article article-type-post" itemscope itemprop="blogPost" >
+  <div id="articleInner" class="clearfix post-1016 post type-post status-publish format-standard has-post-thumbnail hentry category-template-2 category-uncategorized tag-codex tag-edge-case tag-featured-image tag-image tag-template">
+    
+    
+    <div class="article-meta">
+      
+	Posted on <a href="/2017/11/25/angularRoute/" class="article-date">
+	  <time datetime="2017-11-25T01:56:56.087Z" itemprop="datePublished">November 25, 2017</time>
+	</a>
+
+      
+	<span id="busuanzi_container_page_pv">
+	  本文总阅读量<span id="busuanzi_value_page_pv"></span>次
+	</span>
+
+    </div>
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="Angular路由复用策略"><a href="#Angular路由复用策略" class="headerlink" title="Angular路由复用策略"></a>Angular路由复用策略</h1><h2 id="一、引言"><a href="#一、引言" class="headerlink" title="一、引言"></a>一、引言</h2><p>路由在执行过程中对组件无状态操作，即路由离退时组件状态也一并被删除；当然在绝大多数场景下这是合理的。</p>
+<p>但有时一些特殊需求会让人半死亡状态，当然这一切都是为了用户体验；一种非常常见场景，在移动端中用户通过关键词搜索商品，而死不死的这样的列表通常都会是自动下一页动作，此时用户好不容易滚动到第二页并找到想要看的商品时，路由至商品详情页，然后一个后退……用户懵逼了。</p>
+<p>Angular路由与组件一开始就透过 <code>RouterModule.forRoot</code> 形成一种关系，当路由命中时利用 <code>ComponentFactoryResolver</code> 构建组件，这是路由的本质。</p>
+<p>而每一个路由并不一定是一次性消费，Angular 利用 <code>RouteReuseStrategy</code> 贯穿路由状态并决定构建组件的方式；当然默认情况下<code>DefaultRouteReuseStrategy</code>像开头说的，一切都不进行任何处理。</p>
+<blockquote>
+<p><code>RouteReuseStrategy</code> 从2就已经是实验性，当前依然如此，这么久应该是可信任。</p>
+</blockquote>
+<h2 id="二、RouteReuseStrategy"><a href="#二、RouteReuseStrategy" class="headerlink" title="二、RouteReuseStrategy"></a>二、RouteReuseStrategy</h2><p><code>RouteReuseStrategy</code> 我称它为：路由复用策略；并不复杂，提供了几种办法通俗易懂的方法：</p>
+<ul>
+<li><code>shouldDetach</code> 是否允许复用路由</li>
+<li><code>store</code> 当路由离开时会触发，存储路由</li>
+<li><code>shouldAttach</code> 是否允许还原路由</li>
+<li><code>retrieve</code> 获取存储路由</li>
+<li><code>shouldReuseRoute</code> 进入路由触发，是否同一路由时复用路由</li>
+</ul>
+<p>这看起来就像是一个时间轴关系，用一种白话文像是这样：把路由 <code>/list</code> 设置为允许复用（<code>shouldDetach</code>），然后将路由快照存在 <code>store</code> 当中；当 <code>shouldReuseRoute</code> 成立时即：再次遇到 <code>/list</code> 路由后表示需要复用路由，先判断 <code>shouldAttach</code> 是否允许还原，最后从 <code>retrieve</code> 拿到路由快照并构建组件。</p>
+<p>当理解这一原理时，假如我们拿开头搜索列表返回的问题就变得非常容易解决。</p>
+<h2 id="三、一个示例"><a href="#三、一个示例" class="headerlink" title="三、一个示例"></a>三、一个示例</h2><p>诚如上面说明的，只需要实现 <code>RouteReuseStrategy</code> 接口即可自定义一个路由利用策略。</p>
+<ol>
+<li><p>创建策略</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> &#123;RouteReuseStrategy, DefaultUrlSerializer, ActivatedRouteSnapshot, DetachedRouteHandle&#125; <span class="keyword">from</span> <span class="string">'@angular/router'</span>;</div><div class="line"></div><div class="line"><span class="keyword">export</span> <span class="keyword">class</span> SimpleReuseStrategy <span class="keyword">implements</span> RouteReuseStrategy &#123;</div><div class="line"></div><div class="line">  	<span class="comment">/** 定义一个 _cacheRouters 用于缓存数据（路由快照及当前组件实例对象）。 */</span></div><div class="line">    _cacheRouters: &#123; [key: <span class="built_in">string</span>]: <span class="built_in">any</span> &#125; = &#123;&#125;;</div><div class="line"></div><div class="line">  	<span class="comment">/** 表示对所有路由允许复用 如果你有路由不想利用可以在这加一些业务逻辑判断 */</span></div><div class="line">    shouldDetach(route: ActivatedRouteSnapshot): <span class="built_in">boolean</span> &#123;</div><div class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">  </div><div class="line">  	<span class="comment">/** 当路由离开时会触发。按path作为key存储路由快照&amp;组件当前实例对象 */</span></div><div class="line">    store(route: ActivatedRouteSnapshot, handle: DetachedRouteHandle | <span class="literal">null</span>): <span class="built_in">void</span> &#123;</div><div class="line">        <span class="keyword">this</span>._cacheRouters[route.routeConfig.path] = &#123;</div><div class="line">            snapshot: route,</div><div class="line">            handle: handle</div><div class="line">        &#125;;</div><div class="line">    &#125;</div><div class="line">  </div><div class="line">  	<span class="comment">/** 若 path 在缓存中有的都认为允许还原路由 */</span></div><div class="line">    shouldAttach(route: ActivatedRouteSnapshot): <span class="built_in">boolean</span> &#123;</div><div class="line">        <span class="keyword">return</span> !!<span class="keyword">this</span>._cacheRouters[route.routeConfig.path];</div><div class="line">    &#125;</div><div class="line">  </div><div class="line">  	<span class="comment">/** 从缓存中获取快照，若无则返回nul */</span></div><div class="line">    retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle &#123;</div><div class="line">        <span class="keyword">return</span> <span class="keyword">this</span>._cacheRouters[route.routeConfig.path].handle;</div><div class="line">    &#125;</div><div class="line">  </div><div class="line">  	<span class="comment">/** 进入路由触发，判断是否同一路由 */</span></div><div class="line">    shouldReuseRoute(future: ActivatedRouteSnapshot, curr: ActivatedRouteSnapshot): <span class="built_in">boolean</span> &#123;</div><div class="line">        <span class="keyword">return</span> future.routeConfig === curr.routeConfig;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>​</p>
+<p>定义一个 <code>_cacheRouters</code> 用于缓存数据（路由快照及当前组件实例对象）。</p>
+<ul>
+<li><code>shouldDetach</code> 直接返回 <code>true</code> 表示对所有路由允许复用</li>
+<li><code>store</code> 当路由离开时会触发。按path作为key存储路由快照&amp;组件当前实例对象；path等同RouterModule.forRoot中的配置。</li>
+<li><code>shouldAttach</code> 若 <code>path</code> 在缓存中有的都认为允许还原路由</li>
+<li><code>retrieve</code> 从缓存中获取快照，若无则返回null</li>
+<li><code>shouldReuseRoute</code> 进入路由触发，判断是否同一路由</li>
+</ul>
+</li>
+</ol>
+<ol>
+<li><p>注册</p>
+<p>最后将策略注册到模块当中：</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">providers: [</div><div class="line">  &#123; provide: RouteReuseStrategy, useClass: SimpleReuseStrategy &#125;</div><div class="line">]</div></pre></td></tr></table></figure>
+<p>假设我们有这么一个路由配置</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">RouterModule.forRoot([</div><div class="line">  &#123; path: <span class="string">'search'</span>, component: SearchComponent &#125;,</div><div class="line">  &#123; path: <span class="string">'edit/:id'</span>, component: EditComponent &#125;</div><div class="line">])</div></pre></td></tr></table></figure>
+<p>​</p>
+</li>
+</ol>
+
+      
+    </div>
+    <footer class="entry-meta entry-footer">
+      
+      
+      
+        <div id="donation_div"></div>
+
+<script src="/js/vdonate.js"></script>
+<script>
+var a = new Donate({
+  title: '如果觉得我的文章对您有用，请随意打赏。您的支持将鼓励我继续创作!', // 可选参数，打赏标题
+  btnText: 'Donate', // 可选参数，打赏按钮文字
+  el: document.getElementById('donation_div'),
+  wechatImage: 'https://raw.githubusercontent.com/iTimeTraveler/iTimeTraveler.github.io/site/source/about/donate/images/WeChanQR.png',
+  alipayImage: 'https://raw.githubusercontent.com/iTimeTraveler/iTimeTraveler.github.io/site/source/about/donate/images/AliPayQR.jpg'
+});
+</script>
+      
+
+      
+        
+	<div id="comment">
+		<!-- 来必力City版安装代码 -->
+		<div id="lv-container" data-id="city" data-uid="MTAyMC8yOTQ4MS82MDQ5">
+		<script type="text/javascript">
+		   (function(d, s) {
+		       var j, e = d.getElementsByTagName(s)[0];
+
+		       if (typeof LivereTower === 'function') { return; }
+
+		       j = d.createElement(s);
+		       j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+		       j.async = true;
+
+		       e.parentNode.insertBefore(j, e);
+		   })(document, 'script');
+		</script>
+		<noscript>为正常使用来必力评论功能请激活JavaScript</noscript>
+		</div>
+		<!-- City版安装代码已完成 -->
+	</div>
+
+
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2017/09/03/shadowsocks/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Älter</strong>
+      <div class="article-nav-title">shadowsocks</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+<!-- Table of Contents -->
+
+  <aside id="sidebar">
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">Contents</strong>
+    
+      <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Angular路由复用策略"><span class="nav-number">1.</span> <span class="nav-text">Angular路由复用策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、引言"><span class="nav-number">1.1.</span> <span class="nav-text">一、引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、RouteReuseStrategy"><span class="nav-number">1.2.</span> <span class="nav-text">二、RouteReuseStrategy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、一个示例"><span class="nav-number">1.3.</span> <span class="nav-text">三、一个示例</span></a></li></ol></li></ol>
+    
+    </div>
+  </aside>
+</section>
+        
+      </div>
+      <footer id="footer" class="site-footer">
+  
+
+  <div class="clearfix container">
+      <div class="site-info">
+	      &copy; 2017 LlyBlog All Rights Reserved.
+          
+            <span id="busuanzi_container_site_uv">
+              本站访客数<span id="busuanzi_value_site_uv"></span>人次  
+              本站总访问量<span id="busuanzi_value_site_pv"></span>次
+            </span>
+          
+      </div>
+      <div class="site-credit">
+        Theme by <a href="https://github.com/iTimeTraveler/hexo-theme-hiero" target="_blank">hiero</a>
+      </div>
+  </div>
+</footer>
+
+
+<!-- min height -->
+
+<script>
+    var contentdiv = document.getElementById("content");
+
+    contentdiv.style.minHeight = document.body.offsetHeight - document.getElementById("allheader").offsetHeight - document.getElementById("footer").offsetHeight + "px";
+</script>
+    </div>
+    <!-- <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">Home</a>
+  
+    <a href="/archives" class="mobile-nav-link">Archives</a>
+  
+    <a href="/categories" class="mobile-nav-link">Categories</a>
+  
+    <a href="/tags" class="mobile-nav-link">Tags</a>
+  
+    <a href="/about" class="mobile-nav-link">About</a>
+  
+</nav> -->
+    
+
+<!-- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      processEscapes: true
+    }
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for(i=0; i < all.length; i += 1) {
+            all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+<script src="/js/scripts.js"></script>
+<script src="/js/bootstrap.js"></script>
+<script src="/js/main.js"></script>
+
+
+
+
+
+
+
+  <div style="display: none;">
+    <script src="https://s95.cnzz.com/z_stat.php?id=1260716016&web_id=1260716016" language="JavaScript"></script>
+  </div>
+
+
+
+	<script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+	</script>
+
+
+
+
+
+
+  </div>
+
+  <a id="rocket" href="#top" class=""></a>
+  <script type="text/javascript" src="/js/totop.js" async=""></script>
+</body>
+</html>
